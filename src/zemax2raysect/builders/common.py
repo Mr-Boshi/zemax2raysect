@@ -1,7 +1,7 @@
 """Common things used in primitive builder classes."""
 import logging
 from enum import Enum
-from typing import Literal, Tuple, Union
+from typing import Literal, Union
 
 import numpy as np
 
@@ -41,7 +41,7 @@ class ShapeType(Enum):
     RECTANGULAR = "RECTANGULAR"
 
 
-def determine_primitive_type(surface: Union[Standard, Toroidal]) -> Tuple[SurfaceType, ShapeType]:
+def determine_primitive_type(surface: Union[Standard, Toroidal]) -> tuple[SurfaceType, ShapeType]:
     """Determine surface type and shape type for the primitive.
 
     Allows to interpret Standard and Toroidal surfaces as spherical or cylindrical
@@ -158,7 +158,7 @@ def sign(x: float) -> int:
 
 def determine_curvature_signs(
     back_surface: Surface, front_surface: Surface
-) -> Tuple[CurvatureSign, CurvatureSign]:
+) -> tuple[CurvatureSign, CurvatureSign]:
     """Determine curvature signs of the both lens surfaces.
 
     Sign convention is:

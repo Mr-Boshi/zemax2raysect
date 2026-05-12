@@ -1,6 +1,6 @@
 """Builder classes for single surface type elements."""
 import logging
-from typing import Dict, Union
+from typing import Union
 
 from raysect.core import Material
 
@@ -205,7 +205,7 @@ class RectangleBuilder(MirrorBuilder):
 class AbstractSurfacePrimitiveBuilder:
     """Abstract builder class for surface type primitives."""
 
-    builders: Dict[str, MirrorBuilder] = {
+    builders: dict[str, MirrorBuilder] = {
         "circle": CircleBuilder,
         "rectangle": RectangleBuilder,
     }

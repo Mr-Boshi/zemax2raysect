@@ -4,16 +4,17 @@ version = "0.1.0"
 description = "Convert Zemax' ZMX file into a Raysect Node"
 authors = ["Aleksei Shabashov <a.shabashov@iterrf.ru>"]
 readme = "README.md"
+packages = [{ include = "zemax2raysect", from = "src" }]
 
 [tool.poetry.build]
 generate-setup-file = true
 script = "build.py"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-cython = "3.0a5"
-numpy = "1.19.4"
-raysect = "0.7.1"
+python = ">=3.9,<4.0"
+cython = ">=3.0,<4.0"
+numpy = ">=1.26,<3.0"
+raysect = "0.8.1.post1"
 
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "^3.5.1"
@@ -22,17 +23,17 @@ sympy = "^1.11.1"
 
 [build-system]
 requires = [
-    "poetry-core>=1.0.0",
-    "setuptools",
-    "cython==3.0a5",
-    "numpy==1.19.4",
-    "raysect==0.7.1",
+    "setuptools>=64",
+    "wheel",
+    "cython>=3.0,<4.0",
+    "numpy>=1.26,<3.0",
+    "raysect==0.8.1.post1",
 ]
-build-backend = "poetry.core.masonry.api"
+build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 99
-target-version = ['py38']
+target-version = ['py312']
 include = '\.pyi?$'
 
 [tool.isort]
@@ -51,7 +52,7 @@ sections = [
 
 # [tool.flakeheaven]
 # format = "default"
-# max_line_length = 99   
+# max_line_length = 99
 # max_doc_length = 99
 # strictness = "short"
 # docstring_style = "numpy"
@@ -66,15 +67,16 @@ sections = [
 
 [tool.ruff]
 line-length = 99
-target-version = "py38"
-select = ["E", "F", "B", "C4", "D", "SIM", "ANN", "UP", "RET"]
-ignore = ["D203", "D212", "D213"]
+target-version = "py39"
+extend-exclude = ["build", "dist"]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "C4", "SIM", "UP", "RET", "I"]
+ignore = []
+
+[tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["E402"]
 
 [tool.ruff.pycodestyle]
 max-doc-length = 99
 
-[tool.ruff.pydocstyle]
-convention = "numpy"

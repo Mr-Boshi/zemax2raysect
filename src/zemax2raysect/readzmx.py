@@ -1,8 +1,9 @@
 """Read ZMX file."""
+
 import logging
 from collections import namedtuple
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Optional
 
 from .field import Fields, read_fields
 from .surface import AbstractSurfaceBuilder, Surface, SurfaceDescription
@@ -46,7 +47,7 @@ class ZMXreader:
         return None
 
     @staticmethod
-    def read_wavelengths(lines: List[str]) -> Tuple[Wavelength]:
+    def read_wavelengths(lines: list[str]) -> tuple[Wavelength]:
         """Read a section of the ZMX file related to wavelengths.
 
         Parameters
@@ -57,15 +58,14 @@ class ZMXreader:
         -------
         tuple of Wavelength
         """
-        wavelengths: List[Wavelength] = []
+        wavelengths: list[Wavelength] = []
 
         for _, line in enumerate(lines):
-
             columns = line.strip().split()
             cmd = columns[0]
 
             if cmd != "WAVM":
-                return wavelengths
+                return tuple(wavelengths)
 
             # columns[1] is a wavelength ID
             # columns[2] is a wavelength in µm
@@ -82,7 +82,7 @@ class ZMXreader:
 
         return tuple(wavelengths)
 
-    def read(self: "ZMXreader", path: str) -> List[Surface]:
+    def read(self: "ZMXreader", path: str) -> list[Surface]:
         """Read a ZMX file.
 
         Parameters
@@ -101,7 +101,7 @@ class ZMXreader:
 
         self.path = path
         self.encoding = self.determine_encoding(path)
-        self.contents: List[str]
+        self.contents: list[str]
         self.surfaces = []
         self.wavelengths = []
         self.fields = Fields([])
@@ -113,7 +113,6 @@ class ZMXreader:
         unit_converion_factor = 1.0
 
         for i, line in enumerate(self.contents):
-
             columns = line.strip().split()
             if not columns:
                 continue
@@ -141,7 +140,7 @@ class ZMXreader:
         return self.surfaces
 
 
-def readzmx(path: str) -> List[Surface]:
+def readzmx(path: str) -> list[Surface]:
     """Read a ZMX file and resurn a list of surfaces.
 
     Parameters

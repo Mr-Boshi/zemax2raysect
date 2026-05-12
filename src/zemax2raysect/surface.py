@@ -1,6 +1,6 @@
 """Surface classes that represent OpticsStudio Surface Types."""
 from dataclasses import dataclass, field
-from typing import Dict, Sequence, Tuple
+from typing import Sequence
 
 from raysect.core import AffineMatrix3D, rotate_x, rotate_y, rotate_z, translate
 
@@ -48,9 +48,9 @@ class SurfaceDescription:
     disz: float = 0.0
     glas: str = ""
     diam: float = 0.0
-    sqap: Tuple[float, float] = None
-    obdc: Tuple[float, float] = None
-    parm: Dict[int, float] = field(default_factory=dict)
+    sqap: tuple[float, float] = None
+    obdc: tuple[float, float] = None
+    parm: dict[int, float] = field(default_factory=dict)
 
     @staticmethod
     def fromlines(lines: Sequence[str]) -> "SurfaceDescription":
@@ -157,8 +157,8 @@ class Surface:
     thickness: float = 0.0
     material: str = ""
     semi_diameter: float = 0.0
-    aperture: Tuple[float, float] = None
-    aperture_decenter: Tuple[float, float] = None
+    aperture: tuple[float, float] = None
+    aperture_decenter: tuple[float, float] = None
 
     @staticmethod
     def create(description: SurfaceDescription, units_factor: float = 1.0) -> "Surface":
@@ -464,7 +464,7 @@ class AbstractSurfaceBuilder:
         Dictionary which maps surface types from a ZMX-file to Surface subclasses.
     """
 
-    builders: Dict[str, Surface] = {
+    builders: dict[str, Surface] = {
         "COORDBRK": CoordinateBreak,
         "STANDARD": Standard,
         "TOROIDAL": Toroidal,

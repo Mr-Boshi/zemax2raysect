@@ -2,9 +2,11 @@
 
 Used by Poetry to automatically produce setup.py file.
 """
+
+import contextlib
 import multiprocessing
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Optional, Union
 
 import numpy
 from Cython.Build import cythonize
@@ -12,7 +14,8 @@ from setuptools import Extension
 
 PathLike = Union[str, Path]
 
-multiprocessing.set_start_method("fork")
+with contextlib.suppress(RuntimeError):
+    multiprocessing.set_start_method("fork")
 
 EXTENSION_KWARGS = {
     "include_dirs": [".", numpy.get_include()],
@@ -23,8 +26,8 @@ CYTHON_DIRECTIVES = {"language_level": 3, "embedsignature": True}
 
 def collect_extensions(
     source_dir: PathLike,
-    extension_kwargs: Dict[str, List] = None,
-) -> List[Extension]:
+    extension_kwargs: Optional[dict] = None,
+) -> list[Extension]:
 
     if not isinstance(source_dir, Path):
         source_dir = Path(source_dir)
@@ -32,10 +35,9 @@ def collect_extensions(
     if extension_kwargs is None:
         extension_kwargs = EXTENSION_KWARGS
 
-    extensions: List[Extension] = []
+    extensions: list[Extension] = []
 
     for pyx_file in source_dir.rglob("*.pyx"):
-
         module_path = pyx_file.relative_to(source_dir).with_suffix("")
         module_name = str(module_path).replace("/", ".")
 
@@ -46,23 +48,35 @@ def collect_extensions(
 
 
 def cythonize_extensions(
-    extensions: List[Extension],
-    compiler_directives: Dict[str, Union[int, bool]] = None,
-) -> List[Extension]:
+    extensions: list[Extension],
+    compiler_directives: Optional[dict[str, Union[int, bool]]] = None,
+) -> list[Extension]:
 
     if compiler_directives is None:
         compiler_directives = CYTHON_DIRECTIVES
 
-    return cythonize(
-        module_list=extensions,
-        # nthreads=1,
-        nthreads=multiprocessing.cpu_count(),
-        compiler_directives=compiler_directives,
-        # force=True,
-    )
+    try:
+        nthreads = multiprocessing.cpu_count()
+    except (NotImplementedError, OSError):
+        nthreads = 0
+
+    try:
+        return cythonize(
+            module_list=extensions,
+            nthreads=nthreads,
+            compiler_directives=compiler_directives,
+        )
+    except PermissionError:
+        # Some restricted environments deny the semaphore/sysconf calls used by
+        # ProcessPoolExecutor. Retry sequentially so local builds still work.
+        return cythonize(
+            module_list=extensions,
+            nthreads=0,
+            compiler_directives=compiler_directives,
+        )
 
 
-def build(setup_kwargs: Dict = None) -> None:
+def build(setup_kwargs: dict) -> None:
     """Build Cython extensions.
 
     Parameters

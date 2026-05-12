@@ -1,6 +1,7 @@
 """Builder class for cylindrical mirrors and lenses."""
+
 import logging
-from typing import Type, Union
+from typing import Optional, Type, Union
 
 from raysect.core import AffineMatrix3D, Material, rotate_z
 from raysect.primitive import EncapsulatedPrimitive
@@ -36,14 +37,16 @@ class CylindricalMirrorBuilder(MirrorBuilder):
     """Builder class for cylindrical mirror primitive."""
 
     def _clear_parameters(self: "CylindricalMirrorBuilder") -> None:
-        self._diameter: float = None
-        self._curvature: float = None
+        self._diameter: Optional[float] = None
+        self._curvature: Optional[float] = None
         self._material: Material = None
-        self._name: str = None
-        self._curvature_sign: int = None
+        self._name: Optional[str] = None
+        self._curvature_sign: Optional[int] = None
         self._rotation: AffineMatrix3D = AffineMatrix3D()
 
-    def _extract_parameters(self: "CylindricalMirrorBuilder", surface: Toroidal, material: Material = None) -> None:
+    def _extract_parameters(
+        self: "CylindricalMirrorBuilder", surface: Toroidal, material: Material = None
+    ) -> None:
         if not isinstance(surface, Toroidal):
             raise CannotCreatePrimitive(
                 f"Cannot create cylindrical mirror from {surface}"
@@ -66,7 +69,9 @@ class CylindricalMirrorBuilder(MirrorBuilder):
             )
 
         if material and not isinstance(material, Material):
-            raise TypeError(f"Cannot create a mirror from {surface}: material must be a Raysect Material.")
+            raise TypeError(
+                f"Cannot create a mirror from {surface}: material must be a Raysect Material."
+            )
 
         if shape_type == ShapeType.RECTANGULAR:
             LOGGER.warning(
@@ -75,7 +80,6 @@ class CylindricalMirrorBuilder(MirrorBuilder):
             )
 
         if surface.radius != 0:
-
             if surface.radius_horizontal != 0:
                 raise CannotCreatePrimitive()
 
@@ -84,7 +88,6 @@ class CylindricalMirrorBuilder(MirrorBuilder):
             self._rotation = AffineMatrix3D()
 
         elif surface.radius_horizontal != 0:
-
             self._curvature = abs(surface.radius_horizontal)
             self._curvature_sign = sign(surface.radius_horizontal)
             self._rotation = rotate_z(90)
@@ -134,21 +137,21 @@ class CylindricalLensBuilder(LensBuilder):
     """Builder class for cylindrical lens primitives."""
 
     def _clear_parameters(self: "CylindricalLensBuilder") -> None:
-        self._diameter: float = None
-        self._center_thickness: float = None
-        self._back_curvature: float = None
-        self._front_curvature: float = None
-        self._material: Material = None
-        self._name: str = None
+        self._diameter: Optional[float] = None
+        self._center_thickness: Optional[float] = None
+        self._back_curvature: Optional[float] = None
+        self._front_curvature: Optional[float] = None
+        self._material: Optional[Material] = None
+        self._name: Optional[str] = None
         self._rotation: AffineMatrix3D = AffineMatrix3D()
-        self._back_curvature_sign: int = None
-        self._front_curvature_sign: int = None
+        self._back_curvature_sign: Optional[int] = None
+        self._front_curvature_sign: Optional[int] = None
 
     def _extract_parameters(
         self: "CylindricalLensBuilder",
         back_surface: Toroidal,
         front_surface: Toroidal,
-        material: Material = None,
+        material: Optional[Material] = None,
     ) -> None:
         """Extract lens parameters from two surfaces.
 
@@ -167,8 +170,10 @@ class CylindricalLensBuilder(LensBuilder):
         None
         """
         if material and not isinstance(material, Material):
-            raise TypeError(f"Cannot create a lens from {back_surface.name, front_surface.name}:"
-                            " material must be a Raysect Material.")
+            raise TypeError(
+                f"Cannot create a lens from {back_surface.name, front_surface.name}:"
+                " material must be a Raysect Material."
+            )
 
         if not material:
             self._check_for_material(back_surface)
@@ -199,7 +204,6 @@ class CylindricalLensBuilder(LensBuilder):
             )
 
         if back_surface.radius_horizontal == 0:
-
             if front_surface.radius_horizontal != 0:
                 raise NotImplementedError("Cylindrical lens faces have different orientations")
 
@@ -210,7 +214,6 @@ class CylindricalLensBuilder(LensBuilder):
             self._rotation = AffineMatrix3D()
 
         elif back_surface.radius == 0:
-
             if front_surface.radius != 0:
                 raise NotImplementedError("Cylindrical lens faces have different orientations")
 
@@ -262,7 +265,7 @@ class CylindricalLensBuilder(LensBuilder):
         back_surface: Toroidal,
         front_surface: Toroidal,
         direction: Direction = 1,
-        material: Material = None,
+        material: Optional[Material] = None,
     ) -> Union[
         CylindricalBiConvex,
         CylindricalBiConcave,
@@ -286,10 +289,10 @@ class CylindricalLensBuilder(LensBuilder):
         Union[BiConvex, BiConcave, Meniscus, PlanoConvex, PlanoConcave]
         """
         self._clear_parameters()
-        self._extract_parameters(back_surface, front_surface, direction, material)
+        self._extract_parameters(back_surface, front_surface, material)
 
         back_sgn = sign(self._back_curvature_sign) * sign(direction)
-        front_sgn = sign(self._back_curvature_sign) * sign(direction)
+        front_sgn = sign(self._front_curvature_sign) * sign(direction)
 
         LOGGER.debug(
             "Building cylindrical lens: back_sgn = %g, back_sgn = %g",
@@ -317,7 +320,6 @@ class CylindricalLensBuilder(LensBuilder):
             return self._build_biconcave(back_surface, front_surface)
 
         if back_sgn == 0:
-
             if front_sgn < 0:
                 LOGGER.debug("%s is a plano-convex lens", back_surface.name)
                 return self._build_planoconvex(back_surface, front_surface)
@@ -326,7 +328,6 @@ class CylindricalLensBuilder(LensBuilder):
             return self._build_planoconcave(back_surface, front_surface)
 
         if front_sgn == 0:
-
             if back_sgn > 0:
                 LOGGER.debug("%s is a convex-plano lens", back_surface.name)
                 return self._build_convexplano(back_surface, front_surface)

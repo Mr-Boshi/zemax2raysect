@@ -1,6 +1,6 @@
 """Builder classes for two surface flat optical elements."""
 import logging
-from typing import Dict, Union
+from typing import Union
 
 from raysect.core import Material, Point3D
 from raysect.primitive import Box, Cylinder
@@ -211,7 +211,7 @@ class BoxBuilder(MirrorBuilder):
 class AbstractFlatPrimitiveBuilder:
     """Abstract builder class for flat primitives."""
 
-    builders: Dict[str, MirrorBuilder] = {
+    builders: dict[str, MirrorBuilder] = {
         "cylinder": CylinderBuilder,
         "box": BoxBuilder,
     }

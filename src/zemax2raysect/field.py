@@ -2,7 +2,7 @@
 import math
 from collections import UserList
 from dataclasses import dataclass
-from typing import Iterable, List, Tuple
+from typing import Iterable
 
 
 @dataclass
@@ -29,7 +29,7 @@ class Field:
     vcy: float = 0.0
     van: float = 0.0
 
-    def transform(self: "Field", px: float, py: float) -> Tuple[float, float]:
+    def transform(self: "Field", px: float, py: float) -> tuple[float, float]:
         """Transform pupil coordinates according to vignetting factors.
 
         Parameters
@@ -130,7 +130,7 @@ class Fields(UserList):
                 setattr(f, name, v * units_factor)
 
 
-def read_fields(lines: List[str], units_factor: float = 1.0) -> Fields:
+def read_fields(lines: list[str], units_factor: float = 1.0) -> Fields:
     """Read a section of the ZMX file related to fields.
 
     Parameters

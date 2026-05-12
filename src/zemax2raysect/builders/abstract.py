@@ -1,6 +1,4 @@
 """Abstract builder classes for optical elements."""
-from typing import Dict
-
 from raysect.primitive import EncapsulatedPrimitive
 from raysect.optical import Material
 
@@ -16,7 +14,7 @@ from .toroidal import ToricLensBuilder, ToricMirrorBuilder
 class AbstractOpticsBuilder:
     """Base class for abstract optics builder."""
 
-    builders: Dict[str, OpticsBuilder]
+    builders: dict[str, OpticsBuilder]
 
     @classmethod
     def get_builder(cls: "AbstractOpticsBuilder", name: str) -> OpticsBuilder:
@@ -29,7 +27,7 @@ class AbstractOpticsBuilder:
 
 class AbstractMirrorBuilder:
 
-    builders: Dict[str, MirrorBuilder] = {
+    builders: dict[str, MirrorBuilder] = {
         "toroidal": ToricMirrorBuilder,
         "spherical": SphericalMirrorBuilder,
         "cylindrical": CylindricalMirrorBuilder,
@@ -63,7 +61,7 @@ class AbstractMirrorBuilder:
 
 class AbstractLensBuilder:
 
-    builders: Dict[str, LensBuilder] = {
+    builders: dict[str, LensBuilder] = {
         "toroidal": ToricLensBuilder,
         "spherical": SphericalLensBuilder,
         "cylindrical": CylindricalLensBuilder,

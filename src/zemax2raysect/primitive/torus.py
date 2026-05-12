@@ -1,7 +1,4 @@
-from typing import Tuple
-
 import numpy as np
-
 from raysect.core import (
     AffineMatrix3D,
     BoundingBox3D,
@@ -14,7 +11,7 @@ from raysect.core import (
 )
 
 
-def _solve_quartic(a: float, b: float, c: float, d: float, e: float) -> Tuple[float]:
+def _solve_quartic(a: float, b: float, c: float, d: float, e: float) -> tuple[float]:
 
     roots = np.roots((a, b, c, d, e))
     result = []
@@ -51,7 +48,7 @@ class Torus(Primitive):
         self._cached_origin: Point3D = None
         self._cached_direction: Vector3D = None
         self._cached_ray: Ray = None
-        self._cached_t: Tuple[float] = None
+        self._cached_t: tuple[float] = None
         self._next_t: float = None
 
     def hit(self: "Torus", ray: Ray) -> Intersection:
@@ -90,4 +87,4 @@ class Torus(Primitive):
         if len(ts) < 2:
             return
 
-        t0, t1, *self._cached_t = ts
+        # t0, t1, *self._cached_t = ts

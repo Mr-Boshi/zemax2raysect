@@ -1,4 +1,5 @@
 """Routines related to surface material proecssing."""
+
 import logging
 
 from raysect.core import Material
@@ -42,16 +43,18 @@ def find_material(name: str) -> Material:
     if not name:
         return NullMaterial()
 
-    if name.upper() in MATERIALS:
-        return MATERIALS[name]
+    material_name = MATERIALS.get(name.upper())
+    if material_name is not None:
+        return MATERIALS[name.upper()]
 
-    if name.upper() in schott._schott_glass_data:
+    material_name = schott._schott_glass_data.get(name.upper(), None)
+    if material_name is not None:
         return schott(name)
 
     for catalogue_name in schott._schott_glass_data:
         if name.lower() in catalogue_name.lower() or catalogue_name.lower() in name.lower():
             LOGGER.warning(
-                f"Cannot find excact material for {name}" f", using {catalogue_name} instead"
+                f"Cannot find excact material for {name}, using {catalogue_name} instead"
             )
             return schott(catalogue_name)
 
